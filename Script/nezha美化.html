@@ -1,0 +1,75 @@
+<script>
+    // 一体化替换函数
+    function replaceFlags() {
+        // 类名替换
+        document.querySelectorAll('[class*="fi-tw"], .tw-flag').forEach(e => {
+            e.classList.replace('fi-tw', 'fi-cn')?.classList.remove('tw-flag');
+        });
+
+        // Unicode替换
+        document.querySelectorAll('*:not(script):not(style)').forEach(e => {
+            e.childNodes.forEach(n => {
+                if (n.nodeType === 3) n.nodeValue = n.nodeValue.replace(/🇹🇼/g, '🇨🇳');
+            });
+        });
+
+        // 图片兜底
+        document.querySelectorAll('img[src*="tw"]').forEach(img => {
+            img.src = img.src.replace(/(tw)/i, 'cn');
+        });
+    }
+
+    // 监听机制
+    const observer = new MutationObserver(replaceFlags);
+    observer.observe(document.body, { subtree: true, childList: true });
+    document.addEventListener('spa:page-load', replaceFlags);
+    replaceFlags();
+</script>
+
+<style>
+    /* 合并样式规则 */
+    .fi-tw,
+    .tw-flag,
+    [class*="cn-flag"]::before,
+    span:has(> :contains('🇹🇼'))::after {
+        background: url(/resource/template/theme-custom/flags/cn.svg) 0/contain !important;
+        font-size: 0 !important;
+    }
+
+    /* Unicode替换样式 */
+    span:has(> :contains('🇹🇼'))::after {
+        content: '';
+        display: inline-block;
+        width: 16px;
+        height: 12px;
+    }
+</style>
+
+<script>
+    window.CustomBackgroundImage = "https://alist.kirara.uk/p/Media/Picture/Hutao.png?sign=zIAIkPGclEChtL-vbPw4-V52nbdLfgrg-m_UtfVoz6Q=:0";
+    window.CustomMobileBackgroundImage = "https://alist.kirara.uk/p/Media/Picture/Fruina.jpg?sign=tX818PUXWXhXC9HiI_HnTNsM-X7wKT-7hXTJq49eOfc=:0";
+    window.ForceUseSvgFlag = "true";
+</script>
+
+<!-- 引入Noto Sans SC字体 -->
+<style>
+    /* 引入Google Noto Sans SC字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+    /* 设置页面字体 */
+    * {
+        font-family: 'Noto Sans SC', sans-serif !important;
+        /* 设置所有元素使用Noto Sans SC */
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: 'Noto Sans SC', sans-serif !important;
+        /* 设置标题使用Noto Sans SC */
+        font-weight: 700;
+        /* 标题使用粗体 */
+    }
+</style>
