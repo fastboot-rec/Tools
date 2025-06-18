@@ -77,22 +77,17 @@ if confirm "[?] 是否安装配置 Fail2Ban？"; then
     echo -e "\n[+] 写入自定义防护规则..."
     cat > /etc/fail2ban/jail.local << EOF
 [DEFAULT]
-bantime = 600
-findtime = 300
-maxretry = 5
-banaction = iptables-allports
+bantime = 30d
+findtime = 30m
+maxretry = 3
+ignoreip = 127.0.0.1/8
+banaction = ufw
 action = %(action_mwl)s
 
 [sshd]
-ignoreip = 127.0.0.1/8
 enabled = true
-filter = sshd
 port = $ssh_port
-maxretry = 3
-findtime = 30m
-bantime = 30d
-banaction = ufw
-action = %(action_mwl)s
+filter = sshd
 logpath = /var/log/auth.log
 EOF
 
@@ -108,38 +103,6 @@ if confirm "[?] 是否应用网络优化参数？(将覆盖现有配置)"; then
     echo "[!] 原配置已备份为 /etc/sysctl.conf.bak"
     
     cat > /etc/sysctl.conf << EOF
-# 基础转发
-net.ipv4.ip_forward = 1
-net.ipv6.conf.all.forwarding = 1
-net.ipv6.conf.default.forwarding = 1
-
-# TCP优化
-net.core.rmem_max = 16777216
-net.core.wmem_max = 16777216
-net.ipv4.tcp_rmem = 4096 87380 16777216
-net.ipv4.tcp_wmem = 4096 65536 16777216
-net.ipv4.tcp_window_scaling = 1
-net.ipv4.tcp_sack = 1
-net.core.somaxconn = 8192
-net.ipv4.tcp_max_syn_backlog = 8192
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_fin_timeout = 30
-
-# 安全加固
-net.ipv4.icmp_echo_ignore_all = 1
-net.ipv6.icmp.echo_ignore_all = 1
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv4.conf.default.accept_redirects = 0
-net.ipv4.conf.all.send_redirects = 0
-net.ipv6.conf.all.accept_redirects = 0
-net.ipv6.conf.default.accept_redirects = 0
-net.ipv4.conf.all.rp_filter = 1
-
-# 系统资源
-vm.swappiness = 10
-fs.file-max = 2097152
-vm.overcommit_memory = 1
-
 # BBR配置
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
@@ -150,11 +113,9 @@ EOF
 fi
 
 # 最终提示
-echo -e "\n════════════ 所有配置已完成 ════════════"
-echo -e "请执行以下后续操作："
-echo -e "1. 当前 SSH 端口：${ssh_port}，请确认已修改 /etc/ssh/sshd_config"
-echo -e "2. 常用检查命令："
-echo -e "   ufw status verbose         # 查看防火墙状态"
-echo -e "   fail2ban-client status sshd # 查看SSH防护状态"
-echo -e "   sysctl net.ipv4.tcp_congestion_control"
-echo -e "\n* 注意：ICMP响应已全局禁用，如需恢复请修改 /etc/sysctl.conf"
+echo -e "\n✅ 所有初始化操作已完成！"
+echo "⚠️ 请确认："
+echo "1. SSH 端口已修改为: $ssh_port"
+echo "2. 防火墙和 Fail2Ban 已启动保护"
+echo "3. BBR 拥塞控制已生效"
+echo "4. 推荐重新登录终端以使用 Zsh + Powerlevel10k"
