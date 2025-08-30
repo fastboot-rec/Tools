@@ -111,7 +111,7 @@ if confirm "[?] 是否配置防火墙 (UFW)？"; then
     echo -e "\n[+] 正在配置防火墙..."
     # 开放 SSH 端口 & iperf3 端口 5201
     ufw allow "$ssh_port/tcp"
-    ufw allow 5201/tcp
+    ufw allow 5201
     
     if confirm "[?] 是否启用防火墙？(默认Y)"; then
         ufw --force enable
