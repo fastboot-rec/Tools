@@ -51,17 +51,20 @@ fi
 echo -e "\e[32m[√] 系统检测通过：$PRETTY_NAME\e[0m"
 
 #==========================================================
-# 步骤 2: 自动读取 SSH 端口
+# 步骤 2: 自动读取 SSH 端口（更健壮版）
 #==========================================================
 echo -e "\n\e[36m[+] 正在读取 SSH 端口...\e[0m"
 
-ssh_port=$(grep -iE "^Port\s+" /etc/ssh/sshd_config | awk '{print $2}' | head -n1)
+# 更宽松匹配 + 默认值处理 + 调试输出
+ssh_port_raw=$(grep -iE '^[[:space:]]*Port[[:space:]]+' /etc/ssh/sshd_config | awk '{print $2}' | head -n1)
 
-if [ -z "$ssh_port" ]; then
+if [ -z "$ssh_port_raw" ]; then
     ssh_port=22
+    echo -e "\e[33m[!] 未在 sshd_config 中找到 Port 配置，使用默认端口 22\e[0m"
+else
+    ssh_port="$ssh_port_raw"
+    echo -e "\e[32m[√] 检测到 SSH 端口: $ssh_port\e[0m"
 fi
-
-echo -e "\e[32m[√] 检测到 SSH 端口: $ssh_port\e[0m"
 
 #==========================================================
 # 步骤 3: 系统更新 + 升级
